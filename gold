@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precious Metal Prices Widget</title>
+    <style>
+        .widget {
+            font-family: Arial, sans-serif;
+            width: 300px;
+            padding: 20px;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metal {
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="widget">
+    <h2>Live Precious Metal Prices</h2>
+    <div class="metal" id="gold">Gold: Loading...</div>
+    <div class="metal" id="silver">Silver: Loading...</div>
+</div>
+
+<script>
+    const API_KEY = 'MKPGH5DGULD23H0F';
+    const goldElement = document.getElementById('gold');
+    const silverElement = document.getElementById('silver');
+
+    async function fetchMetalPrice(metal) {
+        const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${metal}&to_currency=USD&apikey=${API_KEY}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        return parseFloat(data['Realtime Currency Exchange Rate']['5. Exchange Rate']).toFixed(2);
+    }
+
+    async function updatePrices() {
+        const goldPrice = await fetchMetalPrice('XAU');
+        const silverPrice = await fetchMetalPrice('XAG');
+        goldElement.innerText = `Gold: $${goldPrice} USD`;
+        silverElement.innerText = `Silver: $${silverPrice} USD`;
+    }
+
+    function startUpdating() {
+        updatePrices();  // Fetch prices immediately
+        setInterval(updatePrices, 60000);  // Update every 60 seconds
+    }
+
+    startUpdating();
+</script>
+
+</body>
+</html>
