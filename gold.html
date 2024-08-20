@@ -49,7 +49,7 @@
 
     function startUpdating() {
         updatePrices();  // Fetch prices immediately
-        setInterval(updatePrices, 60000);  // Update every 60 seconds
+        setInterval(updatePrices, 3600000);  // Update every 3600000 milliseconds (1 hour)
     }
 
     startUpdating();
