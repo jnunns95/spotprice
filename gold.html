@@ -1,18 +1,34 @@
-import requests
-import time
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precious Metal Prices</title>
+    <script>
+        const apiKey = 'MKPGH5DGULD23H0F';
+        const goldUrl = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAU&to_currency=USD&apikey=${apiKey}`;
+        const silverUrl = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAG&to_currency=USD&apikey=${apiKey}`;
 
-API_KEY = 'MKPGH5DGULD23H0F'
-GOLD_URL = f'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAU&to_currency=USD&apikey={API_KEY}'
-SILVER_URL = f'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAG&to_currency=USD&apikey={API_KEY}'
+        async function fetchPrice(url) {
+            const response = await fetch(url);
+            const data = await response.json();
+            return data['Realtime Currency Exchange Rate']['5. Exchange Rate'];
+        }
 
-def fetch_metal_prices():
-    gold_response = requests.get(GOLD_URL).json()
-    silver_response = requests.get(SILVER_URL).json()
-    gold_price = gold_response['Realtime Currency Exchange Rate']['5. Exchange Rate']
-    silver_price = silver_response['Realtime Currency Exchange Rate']['5. Exchange Rate']
-    return gold_price, silver_price
+        async function updatePrices() {
+            const goldPrice = await fetchPrice(goldUrl);
+            const silverPrice = await fetchPrice(silverUrl);
+            document.getElementById('gold-price').textContent = `Gold: $${goldPrice}`;
+            document.getElementById('silver-price').textContent = `Silver: $${silverPrice}`;
+        }
 
-while True:
-    gold_price, silver_price = fetch_metal_prices()
-    print(f"Gold: ${gold_price} | Silver: ${silver_price}")
-    time.sleep(1800)  # Fetches data every 30 minutes
+        setInterval(updatePrices, 1800000); // Updates every 30 minutes
+        window.onload = updatePrices; // Fetch prices on page load
+    </script>
+</head>
+<body>
+    <h1>Precious Metal Prices</h1>
+    <p id="gold-price">Loading Gold Price...</p>
+    <p id="silver-price">Loading Silver Price...</p>
+</body>
+</html>
