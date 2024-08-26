@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Precious Metal Prices</title>
     <script>
-        const apiKey = 'MKPGH5DGULD23H0F';
+        const apiKey = 'FMGDSNY6RY371HUV';
         const goldUrl = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAU&to_currency=USD&apikey=${apiKey}`;
         const silverUrl = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAG&to_currency=USD&apikey=${apiKey}`;
 
@@ -21,7 +21,7 @@
                     throw new Error('Invalid or missing API data');
                 }
             } catch (error) {
-                console.error('Error fetching price:', error);
+                console.error('Error fetching price:', error.message);
                 return 'Error fetching price';
             }
         }
