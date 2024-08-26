@@ -1,71 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gold Price Widget</title>
-    <style>
-        .widget {
-            font-family: Arial, sans-serif;
-            width: 300px;
-            padding: 20px;
-            background-color: #f7f7f7;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .metal {
-            margin: 10px 0;
-            font-size: 1.2em;
-        }
-    </style>
-</head>
-<body>
+import requests
+import time
 
-<div class="widget">
-    <h2>Live Gold Price</h2>
-    <div class="metal" id="gold">Gold: Loading...</div>
-</div>
+API_KEY = 'MKPGH5DGULD23H0F'
+GOLD_URL = f'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAU&to_currency=USD&apikey={API_KEY}'
+SILVER_URL = f'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAG&to_currency=USD&apikey={API_KEY}'
 
-<script>
-    const API_KEY = MKPGH5DGULD23H0F;
-    const goldElement = document.getElementById('gold');
+def fetch_metal_prices():
+    gold_response = requests.get(GOLD_URL).json()
+    silver_response = requests.get(SILVER_URL).json()
+    gold_price = gold_response['Realtime Currency Exchange Rate']['5. Exchange Rate']
+    silver_price = silver_response['Realtime Currency Exchange Rate']['5. Exchange Rate']
+    return gold_price, silver_price
 
-    async function fetchGoldPrice() {
-        const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAU&to_currency=USD&apikey=${API_KEY}`;
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            if (data['Realtime Currency Exchange Rate'] && data['Realtime Currency Exchange Rate']['5. Exchange Rate']) {
-                return parseFloat(data['Realtime Currency Exchange Rate']['5. Exchange Rate']).toFixed(2);
-            } else {
-                throw new Error('Unexpected API response format.');
-            }
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            return null;  // Return null if there was an error
-        }
-    }
-
-    async function updateGoldPrice() {
-        const goldPrice = await fetchGoldPrice();
-        if (goldPrice) {
-            goldElement.innerText = `Gold: $${goldPrice} USD`;
-        } else {
-            goldElement.innerText = `Gold: Error loading`;
-        }
-    }
-
-    function startUpdating() {
-        updateGoldPrice();  // Fetch price immediately
-        setInterval(updateGoldPrice, 3600000);  // Update every 3600000 milliseconds (1 hour)
-    }
-
-    startUpdating();
-</script>
-
-</body>
-</html>
+while True:
+    gold_price, silver_price = fetch_metal_prices()
+    print(f"Gold: ${gold_price} | Silver: ${silver_price}")
+    time.sleep(1800)  # Fetches data every 30 minutes
