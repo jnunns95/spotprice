@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Precious Metal Prices</title>
     <style>
-        /* Add this CSS to set the background color to yellow */
+        /* Set the background color to yellow */
         body {
             background-color: yellow;
             font-family: Arial, sans-serif;
@@ -14,18 +14,20 @@
         }
     </style>
     <script>
-        const apiKey = 'FMGDSNY6RY371HUV';
-        const goldUrl = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAU&to_currency=USD&apikey=${apiKey}`;
-        const silverUrl = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAG&to_currency=USD&apikey=${apiKey}`;
+        const apiKey = 'n2uwh27vwgrjm88i5137gmy9d9cs8kt3xwh9j1fo04v3ohdc3lab51rqz2oo';
+        const baseUrl = 'https://metals-api.com/api/latest';
 
-        async function fetchPrice(url) {
+        async function fetchPrice(symbol) {
+            const url = `${baseUrl}?access_key=${apiKey}&symbols=${symbol}&base=USD`;
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 console.log(data);  // Log the entire response to the console
 
-                if (response.ok && data['Realtime Currency Exchange Rate']) {
-                    return data['Realtime Currency Exchange Rate']['5. Exchange Rate'];
+                if (response.ok && data.rates && data.rates[symbol]) {
+                    return data.rates[symbol];
+                } else if (data.error) {
+                    throw new Error(data.error.message); // Log error messages from API
                 } else {
                     throw new Error('Invalid or missing API data');
                 }
@@ -36,10 +38,10 @@
         }
 
         async function updatePrices() {
-            const goldPrice = await fetchPrice(goldUrl);
-            const silverPrice = await fetchPrice(silverUrl);
-            document.getElementById('gold-price').textContent = `Gold: $${goldPrice}`;
-            document.getElementById('silver-price').textContent = `Silver: $${silverPrice}`;
+            const goldPrice = await fetchPrice('XAU');
+            const silverPrice = await fetchPrice('XAG');
+            document.getElementById('gold-price').textContent = `Gold: $${goldPrice} per ounce`;
+            document.getElementById('silver-price').textContent = `Silver: $${silverPrice} per ounce`;
         }
 
         setInterval(updatePrices, 1800000); // Updates every 30 minutes
